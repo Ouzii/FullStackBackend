@@ -1,0 +1,25 @@
+{
+  "name": "fullstackbackend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "node_modules/.bin/nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ouzii/FullStackBackend.git"
+  },
+  "author": "Ouzii",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ouzii/FullStackBackend/issues"
+  },
+  "homepage": "https://github.com/Ouzii/FullStackBackend#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "nodemon": "^1.14.11"
+  }
+}
