@@ -1,8 +1,15 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
 
 app.use(bodyParser.json())
+
+morgan.token('data', function (req, res) {
+    return JSON.stringify(req.body)
+})
+
+app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
 
 let persons = [
     {
@@ -82,4 +89,6 @@ const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
+
+
 
