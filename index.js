@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 
 app.use(bodyParser.json())
 app.use(cors())
@@ -14,31 +15,45 @@ morgan.token('data', function (req, res) {
 
 app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
 
-let persons = [
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-    },
-    {
-        "name": "Martti Tienari",
-        "number": "040-123456",
-        "id": 2
-    },
-    {
-        "name": "Arto Järvinen",
-        "number": "040-123456",
-        "id": 3
-    },
-    {
-        "name": "Lea Kutvonen",
-        "number": "040-123456",
-        "id": 4
-    },
-]
+// let persons = [
+//     {
+//         "name": "Arto Hellas",
+//         "number": "040-123456",
+//         "id": 1
+//     },
+//     {
+//         "name": "Martti Tienari",
+//         "number": "040-123456",
+//         "id": 2
+//     },
+//     {
+//         "name": "Arto Järvinen",
+//         "number": "040-123456",
+//         "id": 3
+//     },
+//     {
+//         "name": "Lea Kutvonen",
+//         "number": "040-123456",
+//         "id": 4
+//     },
+// ]
 
-app.get('/api/persons', (req, res) => {
-    res.json(persons)
+
+const formatPerson = (person) => {
+    return {
+        name: person.name,
+        number: person.number,
+        id: person._id
+    }
+}
+
+app.get('/api/persons', (request, response) => {
+
+    Person
+        .find({}, { __v: 0 })
+        .then(persons => {
+            response.json(persons.map(Person.format))
+        })
 })
 
 app.get('/info', (req, res) => {
@@ -52,33 +67,32 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({ error: 'name/number missing' })
     }
 
-    let isOld = function (element) {
-        return element.name.toUpperCase() === body.name.toUpperCase()
-    }
+    // let isOld = function (element) {
+    //     return element.name.toUpperCase() === body.name.toUpperCase()
+    // }
 
-    if (persons.some(isOld)) {
-        return response.status(400).json({ error: 'name must be unique'})
-    }
+    // if (persons.some(isOld)) {
+    //     return response.status(400).json({ error: 'name must be unique' })
+    // }
 
-    const person = {
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        id: Math.floor(Math.random() * Math.floor(10000))
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    person
+        .save()
+        .then(savedPerson => {
+            response.json(Person.format(savedPerson))
+        })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(note => note.id === id)
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    person
+        .findById(request.params.id)
+        .then(person => {
+            response.json(Person.format(person))
+        })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
