@@ -76,28 +76,36 @@ app.post('/api/persons', (request, response) => {
         number: body.number
     })
 
-    person
-        .save()
-        .then(savedPerson => {
-            response.json(Person.format(savedPerson))
+    Person
+        .find({ name: person.name })
+        .then(result => {
+            if (result.length > 0) {
+                response.status(409).send({ error: 'Name exists already' })
+            } else {
+                person
+                    .save()
+                    .then(savedPerson => {
+                        response.json(Person.format(savedPerson))
+                    })
+            }
         })
 })
 
 app.get('/api/persons/:id', (request, response) => {
     Person
-      .findById(request.params.id)
-      .then(person => {
-        if (person) {
-          response.json(Person.format(person))
-        } else {
-          response.status(404).end()
-        }
-      })
-      .catch(error => {
-        console.log(error)
-        response.status(400).send({ error: 'malformatted id' })
-      })
-  })
+        .findById(request.params.id)
+        .then(person => {
+            if (person) {
+                response.json(Person.format(person))
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            response.status(400).send({ error: 'malformatted id' })
+        })
+})
 
 app.delete('/api/persons/:id', (request, response) => {
     Person
